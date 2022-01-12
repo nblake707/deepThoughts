@@ -102,12 +102,12 @@ const resolvers = {
 
       throw new AuthenticationError("You need to be logged in!");
     },
-    // looks for incoming friend id and adds to current user's friends array. 
+    // looks for incoming friend id and adds to current user's friends array.
     addFriend: async (parent, { friendId }, context) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { friends: friendId } }, // addToSet prevents duplicate enteries 
+          { $addToSet: { friends: friendId } }, // addToSet prevents duplicate enteries
           { new: true }
         ).populate("friends");
 
