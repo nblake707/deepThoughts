@@ -38,8 +38,8 @@ function App() {
               <Route exact path="/" element={<Home />} />
               <Route exact path="/login" element={<Login />} />
               <Route exact path="/signup" element={<Signup />} />
-              <Route exact path="/profile" element={<Profile />} />
-              <Route exact path="/thought" element={<SingleThought />} />
+              <Route exact path="/profile/:username" element={<Profile />} />
+              <Route exact path="/thought/:id" element={<SingleThought />} />
               <Route path="*" element={<NoMatch />} />
             </Routes>
           </div>

@@ -11,7 +11,7 @@ const Home = () => {
      if data exists then store it in the thoughts constant / if undefined save an empty array to thoughts
    */
   const thoughts = data?.thoughts || [];
-  console.log(thoughts);
+ 
 
   return (
     <main>
