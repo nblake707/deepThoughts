@@ -4,7 +4,7 @@ import Auth from "../../Utils/auth";
 
 const Header = () => {
   const logout = (e) => {
-    e.preventDefault(); // over riding below <a></a>'s default behavior to refresh
+    e.preventDefault(); // overriding below <a></a>'s default behavior to refresh
     Auth.logout();
   };
 
