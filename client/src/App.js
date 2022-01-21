@@ -5,7 +5,8 @@ import {
   InMemoryCache,
   createHttpLink,
 } from "@apollo/client";
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import { setContext } from "@apollo/client/link/context";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -14,19 +15,33 @@ import NoMatch from "./pages/NoMatch";
 import SingleThought from "./pages/SingleThought";
 import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
+import Auth from './Utils/auth';
 
-// establish new link to the GraphQL server @ /graphql
-const httpLink = createHttpLink({
-  uri: "/graphql",
-});
-
-// apollo client constructor
-const client = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache(),
-});
 
 function App() {
+  const isloggedIn = Auth.loggedIn();
+  
+  // establish new link to the GraphQL server @ /graphql
+  const httpLink = createHttpLink({
+    uri: "/graphql",
+  });
+
+  // retrieves token from localStorage & combines with existing httpLink (all http requests include token in headers)
+  const authLink = setContext((_, { headers }) => { // underscore serves as placeholder for the unused first param
+    const token = localStorage.getItem("id_token");
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      },
+    };
+  });
+
+  // apollo client constructor
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
+  });
   return (
     // provider enables entire application to interact with Apollo Client instance
     <ApolloProvider client={client}>
@@ -38,7 +53,9 @@ function App() {
               <Route exact path="/" element={<Home />} />
               <Route exact path="/login" element={<Login />} />
               <Route exact path="/signup" element={<Signup />} />
-              <Route exact path="/profile/:username" element={<Profile />} />
+              <Route path="profile" element={<Profile />} >
+                <Route path=":username" element={<Profile />} />
+              </Route>
               <Route exact path="/thought/:id" element={<SingleThought />} />
               <Route path="*" element={<NoMatch />} />
             </Routes>

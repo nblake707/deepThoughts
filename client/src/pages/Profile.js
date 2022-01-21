@@ -1,29 +1,46 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import ThoughtList from '../components/ThoughtList';
 import FriendList from '../components/FriendList';
 import { useQuery } from '@apollo/client';
-import { QUERY_USER } from '../Utils/queries';
+import { QUERY_USER, QUERY_ME } from '../Utils/queries';
+import Auth from '../Utils/auth';
 
 const Profile = () => {
+
   // retrieves username from the URL
   const { username: name } = useParams();
   
-  const { loading, data } = useQuery(QUERY_USER, {
+  const { loading, data } = useQuery(name ? QUERY_USER : QUERY_ME, { // conditionally deciding which query to run
     variables: { username: name }
   });
 
-  const user = data?.user || {};
+  const user = data?.me || data?.user || {};
+
+  // need to convert to lower case to get both names to match
+  if (Auth.loggedIn() && Auth.getProfile().data.username.toLowerCase() === name) {
+       return <Navigate to="/profile" />
+    }
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  // navigating to /profile without being logged in. 
+  if (!user?.username) {
+    return (
+      <h4>
+        You need to be logged in to see this page. Use the navigation links above to sign up or log in!
+      </h4>
+    );
   }
 
   return (
     <div>
       <div className="flex-row mb-3">
         <h2 className="bg-dark text-secondary p-3 display-inline-block">
-          Viewing {user.username}'s profile.
+          {/* if the user param is present then display that user's name - if not displays logged in users name */}
+          Viewing {name ? `${user.username}'s` : 'your'} profile.
         </h2>
       </div>
 
