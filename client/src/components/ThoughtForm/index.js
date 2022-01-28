@@ -18,16 +18,16 @@ const ThoughtForm = () => {
            query: QUERY_THOUGHTS,
            data: { thoughts: [addThought, ...thoughts] },
          });
+
+        // update me object's cache, appending new thought to the end of the array
+        const { me } = cache.readQuery({ query: QUERY_ME});
+        cache.writeQuery({
+          query: QUERY_ME,
+          data: { me: { ...me, thoughts: [...me.thoughts, addThought] } } // possible issue here 
+        });
       } catch (e) {
         console.log(e);
       }
-
-      // update me object's cache, appending new thought to the end of the array
-      const { me } = cache.readQuery({ query: QUERY_ME});
-      cache.writeQuery({
-        query: QUERY_ME,
-        data: { me: { ...me, thoughts: [...me.thoughts, addThought] } }
-      });
     },
     // this function makes it possible to update thoughts on homepage without refresh
   });
@@ -56,6 +56,8 @@ const ThoughtForm = () => {
     } catch (e) {
       console.log(e);
     }
+
+    // console.log(error);
   };
 
   return (
